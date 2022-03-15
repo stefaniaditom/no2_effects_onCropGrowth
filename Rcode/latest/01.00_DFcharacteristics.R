@@ -25,8 +25,6 @@ df_raw <- bind_rows(list(df_maize,df_wheat,df_rice))
 
 # info for Table S2 in paper: Number of points per Region/Season
 df_raw %>%group_by(CNTRY_NAME,crop)%>% summarise(n = n())
-
-# info for Table S2 in paper: number of years per region/season
 table_w_years_used<-df_raw %>%group_by(CNTRY_NAME,crop, year_gws)%>% summarise(n = n())
 
 

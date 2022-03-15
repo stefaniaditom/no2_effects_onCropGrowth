@@ -70,7 +70,3 @@ saveR2 <- function(df){
 
 
 DF_withR2<-saveR2(df_maize)
-
-
-
-
