@@ -1,2 +1,2 @@
-# no2_effects_onCropGrowth
-“Globally ubiquitous negative effects of nitrogen dioxide on crop growth” Public repo
+# Globally ubiquitous negative effects of nitrogen dioxide on crop growth
+This repo contains code and data to replicate results shown in the paper.
