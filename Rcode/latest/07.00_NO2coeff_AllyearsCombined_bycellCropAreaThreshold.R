@@ -153,6 +153,10 @@ crop_names <- c(
 )
 
 
+
+
+
+
 plot_NO2coeffs_vs_th<-function(Dataframe,vi,shapes,fname){
   
   Dataframe$crop[Dataframe$crop=='maize'] <- 'summer'
@@ -162,26 +166,26 @@ plot_NO2coeffs_vs_th<-function(Dataframe,vi,shapes,fname){
   Dataframe<-Dataframe %>%filter(greenness_var==vi)
   Dataframe<-Dataframe %>%filter(NpointsPerc>0.01)
   Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("Western Europe", "United States", "South America","India","China")))
-
   
-  ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = th))+
-    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=1,stroke = 2)+
+  
+  ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = th, colour=crop))+
+    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=0.7,stroke = 2)+
     geom_errorbar(aes(xmin=no2CI_2.5, xmax=no2CI_97.5), width=.0002)+ # using 95% CI
     facet_grid(vars(CNTRY_NAME))+
     ylab('crop area threshold (m2/gridcell)')+
     xlab(expression(NO[2]~coefficient))+
     geom_vline(xintercept=0,color="grey")+
-
+    
     coord_cartesian(ylim = c(-300000000, 2700000000))+
     scale_x_continuous(labels = prettyZero)+
-
+    
     guides(size=FALSE,
            colour = guide_legend(order = 1,reverse=TRUE),
            shape = guide_legend(order = 2)
-           )+
+    )+
     labs(shape="p-value",colour="season")+
     scale_shape_manual(values=c(16,1))+
-    scale_colour_manual(values=c("goldenrod2", "royalblue1"))+ 
+    scale_colour_manual(values=c("#00B680", "#007CA6"))+ #green/blue
     theme_bw()
   
   ggsave(
@@ -206,7 +210,6 @@ plot_NO2coeffs_vs_th(outAll.overall,'NIRv_max',c(16),"S3_no2coeff_vs_cropAreaTh.
 
 
 
-
 plot_Npoints_vs_th<-function(Dataframe,vi,shapes,fname){
   
   Dataframe$crop[Dataframe$crop=='maize'] <- 'summer'
@@ -218,8 +221,8 @@ plot_Npoints_vs_th<-function(Dataframe,vi,shapes,fname){
   
   Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("Western Europe", "United States", "South America","India","China")))
   
-  ggplot(data = Dataframe, mapping = aes(x = Npoints, y = th))+
-    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=1,stroke = 2)+
+  ggplot(data = Dataframe, mapping = aes(x = Npoints, y = th, colour=crop))+
+    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=0.7,stroke = 2)+
     facet_grid(vars(CNTRY_NAME))+
     ylab('crop area threshold (m2/gridcell)')+
     xlab('Number of points')+
@@ -231,7 +234,8 @@ plot_Npoints_vs_th<-function(Dataframe,vi,shapes,fname){
     )+
     labs(shape="p-value",colour="season")+
     scale_shape_manual(values=c(16,1))+ 
-    scale_colour_manual(values=c("goldenrod2", "royalblue1"))+ 
+    # scale_colour_manual(values=c("goldenrod2", "royalblue1"))+ 
+    scale_colour_manual(values=c("#00B680", "#007CA6"))+ #green/blue
     theme_bw()
   
   ggsave(

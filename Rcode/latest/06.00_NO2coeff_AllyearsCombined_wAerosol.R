@@ -145,21 +145,21 @@ plot_NO2coeffs_v2<-function(Dataframe,vi,shapes,fname){
   
   Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("Western Europe", "United States", "South America","India","China")))
 
-  ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = CNTRY_NAME))+
-    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=1,stroke = 2)+
-    geom_errorbar(aes(xmin=no2CI_2.5, xmax=no2CI_97.5), width=.0002)+ # using 95% CI
-    ylab(NULL)+
-    xlab(expression(NO[2]~coefficient))+
-    geom_vline(xintercept=0,color="grey")+
-    scale_x_continuous(labels = prettyZero)+
+  ggplot(data=Dataframe, mapping=aes(y= NO2coef, x = CNTRY_NAME, ymin=no2CI_2.5, ymax=no2CI_97.5, colour=crop))+
+   geom_point(aes(size=NpointsPerc, shape=signif),alpha=1,stroke=2, position=position_dodge(width=0.3))+
+    geom_errorbar(width=.002, position=position_dodge(0.3))+ # using 95% CI
+    coord_flip()+
+    xlab(NULL)+
+    ylab(expression(NO[2]~coefficient))+
+    geom_hline(yintercept=0,color="grey")+
+    scale_y_continuous(labels = prettyZero)+
     guides(size=FALSE,
-           colour = guide_legend(order = 1,reverse=TRUE), 
+           colour = guide_legend(order = 1,reverse=TRUE),
            shape = guide_legend(order = 2)
-           )+
+    )+# get rid of Npoints legend
     labs(shape="p-value",colour="season")+
-    scale_shape_manual(values=c(16,1))+ 
-    scale_colour_manual(values=c("goldenrod2", "royalblue1"))+ 
-
+    scale_shape_manual(values=c(16,1))+ # shapes need to be from21-25 to have a fill and color property
+    scale_colour_manual(values=c("#00B680", "#007CA6"))+ #green/blue
     theme_bw()
 
   ggsave(

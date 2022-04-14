@@ -190,6 +190,7 @@ plot_coeffvsAvg <- function(df,fname){
   ggplot(data = df, mapping = aes(x = NO2avg, y = NO2coef))+
     geom_point(aes(color = CNTRY_NAME, shape = year_gws),size=3)+
     geom_errorbar(aes(ymin=no2CI_2.5, ymax=no2CI_97.5), width=.0002)+ 
+    scale_color_brewer(palette="Set2")+
     facet_grid(greenness_var ~ crop) +
     expand_limits(y=0)+
     geom_hline(yintercept=0,color="grey")+
@@ -202,7 +203,7 @@ plot_coeffvsAvg <- function(df,fname){
   ggsave(
     fname,
     plot = last_plot(),
-    device = "png",
+    device = "pdf",
     path = here("figs"),
     scale = 1,
     width = 20,
@@ -214,7 +215,7 @@ plot_coeffvsAvg <- function(df,fname){
     
 }
 
-plot_coeffvsAvg(outSplit.overall,'figS4_no2coeffVSno2Average.png')
+plot_coeffvsAvg(outSplit.overall,'figS4_no2coeffVSno2Average.pdf')
 #############################################################################
 
 

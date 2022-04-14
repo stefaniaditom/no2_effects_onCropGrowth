@@ -1,5 +1,5 @@
 ################################################################################################################
-## Table S2. Characteristics of regions used in the study                                                      
+## Table S2. Characteristics of regions used in the study.                                                  
 ## Data were gathered using Google Earth Engine. GEE scripts for exporting the data are available upon request
 ################################################################################################################
 

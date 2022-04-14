@@ -13,6 +13,7 @@ library(here)
 library("data.table")
 library(ggridges)
 library(sjPlot)
+library(RColorBrewer)
 here()
 
 
@@ -46,13 +47,15 @@ plot_NO2Dist <- function(df,fname){
     facet_grid(vars(CNTRY_NAME), scales = "free",switch="y")+
     coord_cartesian(xlim = c(0, 100), ylim = c(1,5.5))+
     ylab(NULL)+
-    xlab('NO2 Tropospheric column (1e-6 mol/m2)')+
+    xlab('')+
+    # xlab('NO2 Tropospheric column (1e-6 mol/m2)')+
     # xlab(expression(NO[2]~Tropospheric~column~(1e^-6~mol/m^2)))+
-    ggtitle(title)+
+    # ggtitle(title)+
     # theme(axis.title.x = element_text(angle=0, hjust = 0.5))+
     # theme(plot.title = element_text(hjust = 0.5))+
     # scale_fill_manual(values = c("gray30","gray50","gray70"))+
-    scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    # scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    scale_fill_brewer(palette="Set2")+
     geom_text(aes(label = CNTRY_NAME), x = 80, y = Inf, vjust=1.5) +
     guides(fill=guide_legend(title=""))+
     theme(
@@ -63,7 +66,7 @@ plot_NO2Dist <- function(df,fname){
       axis.ticks.y=element_blank(),
       panel.background = element_rect(fill = 'white', colour = 'gray90')
     )
-  
+
   ggsave(
     fname,
     plot = last_plot(),
@@ -120,10 +123,12 @@ plot_NO2AnomaliesDist <- function(df, LL_FE, fname){
     facet_grid(vars(CNTRY_NAME), scales = "free",switch="y")+
     coord_cartesian(xlim = c(-20, 20), ylim = c(1,5.5))+
     ylab(NULL)+
-    xlab('NO2 Tropospheric column (1e-6 mol/m2)')+
+    xlab('')+
+    # xlab('NO2 Tropospheric column (1e-6 mol/m2)')+
     # xlab(bquote('NO2 Tropospheric column (1'~e^-6 ~ 'mol/' ~ m^2 ~')' ))+
     ggtitle(paste0(title,' ',title2))+
-    scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    # scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    scale_fill_brewer(palette="Set2")+
     # theme(axis.title.x = element_text(angle=0, hjust = 0.5))+
     # theme(plot.title = element_text(hjust = 0.5))+
     # guides(fill=guide_legend(title=""))+
@@ -200,6 +205,8 @@ plot_RatioDist_byYear <- function(df,fname){
   # HISTOGRAM ##
   ggplot() +
     geom_histogram(data = df, aes(x=monthlyRationHCHO_NO2, fill=high_ratio),bins = 200)+
+    # scale_fill_brewer(palette="Set2", direction=-1)+
+    # scale_fill_manual(values = c("#FC8D62","#8DA0CB"))+
     # facet_grid(vars(CNTRY_NAME,year_gws), scales = "free")+
     facet_grid(vars(CNTRY_NAME), scales = "free")+
     # facet_grid(vars(CNTRY_NAME))+
@@ -232,13 +239,13 @@ plot_RatioDist_byYear <- function(df,fname){
     path = here("figs"),
     scale = 1,
     width = 12,
-    height = 10,
+    # height = 10,
     # height = 4.8, #rice
     units = "cm",
     dpi = 600,
     limitsize = TRUE
   )
-  
+
 }
 plot_RatioDist_byYear(df_maize %>% filter(year_gws==2020),"fig5_ratiohist_summer2020.png")
 plot_RatioDist_byYear(df_wheat %>% filter(year_gws==2020),"fig5_ratiohist_winter2020.png")
@@ -286,7 +293,8 @@ plot_NH3Dist_v2 <- function(df,fname){
     # xlab(expression(NO[2]~Tropospheric~column~(1e^-6~mol/m^2)))+
     ggtitle(title)+
     # scale_fill_manual(values = c("gray30","gray50","gray70"))+
-    scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    # scale_fill_manual(values = c("#F8766D","#00BA38","#619CFF"))+
+    scale_fill_brewer(palette="Set2")+
     # theme(axis.title.x = element_text(angle=0, hjust = 0.5))+
     # theme(plot.title = element_text(hjust = 0.5))+
     
@@ -308,16 +316,16 @@ plot_NH3Dist_v2 <- function(df,fname){
     path = here("figs"),
     scale = 1,
     width = 12,
-    height = 10,#maize,wheat
-    # height = 4.8, #rice
+    # height = 10,#maize,wheat
+    height = 4.8, #rice
     units = "cm",
     dpi = 600,
     limitsize = TRUE
   )
 }
-plot_NH3Dist_v2(df_maize,"figS3_summer.png")
-plot_NH3Dist_v2(df_wheat,"figS3_winter.png")
-plot_NH3Dist_v2(df_rice,"figS3_rice.png")
+plot_NH3Dist_v2(df_maize,"figS5_summer.png")
+plot_NH3Dist_v2(df_wheat,"figS5_winter.png")
+plot_NH3Dist_v2(df_rice,"figS5_rice.png")
 
 
 ############################################################################################

@@ -11,6 +11,7 @@ library(here)
 library("data.table")
 library(ggridges)
 library(sjPlot)
+# library("ggstance")
 here()
 
 
@@ -313,7 +314,11 @@ bar_yieldchange <-function(df,fname){
   # ggplot(data = df, mapping = aes(x=country_crop,y=percYieldChange, fill=crop))+
   ggplot(data = df, mapping = aes(x=Region,y=percYieldChange, fill=crop))+
     geom_bar(stat="identity", position=position_dodge())+
-    scale_fill_manual(values=c("goldenrod2", "royalblue1"))+
+    # scale_fill_manual(values=c("goldenrod2", "royalblue1"))+
+    # scale_fill_manual(values=c("goldenrod2", "royalblue1"))+
+    # scale_fill_manual(values=c("#DC3220", "#005AB5"))+
+    # scale_fill_manual(values=c("#ffc20a", "#0c7bdc"))+
+    scale_fill_manual(values=c("#00B680", "#007CA6"))+ #green/blue
     # coord_cartesian(ylim = c(-2, 40))+
     ylab("Yield Change %")+
     xlab(NULL)+
@@ -328,6 +333,18 @@ bar_yieldchange <-function(df,fname){
     theme_bw()
   
   
+  # ggsave(
+  #   fname,
+  #   plot = last_plot(),
+  #   device = "png",
+  #   path = here("figs"),
+  #   scale = 1,
+  #   width = 18,
+  #   height = 6,
+  #   units = "cm",
+  #   dpi = 200,
+  #   limitsize = TRUE
+  # )
   ggsave(
     fname,
     plot = last_plot(),
@@ -385,66 +402,35 @@ crop_names <- c(
 
 
 
-
-
-
-
 # One Panel for Fig 4- NIRv and Summer and Winter color coded
 plot_NO2coeffs_v2<-function(Dataframe,vi,shapes,fname){
   
-  # Dataframe<-outAll.overall
   Dataframe$crop[Dataframe$crop=='maize'] <- 'summer'
   Dataframe$crop[Dataframe$crop=='wheat'] <- 'winter'
   Dataframe$crop[Dataframe$crop=='rice'] <- 'rice'
   
-  # Dataframe<- Dataframe %>% mutate(country_crop = paste0(CNTRY_NAME,'_',crop))
-  
   Dataframe<-Dataframe %>%filter(greenness_var==vi)
   Dataframe<-Dataframe %>%filter(NpointsPerc>0.01)
-  
-  # to sort y-axis label from China to W Europe alphabetically
-  # Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("WEurope", "United States", "SAmerica","India","China")))
+ 
   Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("Western Europe", "United States", "South America","India","China")))
-  # class(Dataframe$CNTRY_NAME)
   
-  ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = CNTRY_NAME))+
-    geom_point(aes(colour=crop, size=NpointsPerc, shape=signif),alpha=1,stroke = 2)+
-    # geom_point(aes(fill=CNTRY_NAME, colour=signif, size=NpointsPerc, shape=regime),alpha=0.4,stroke=1)+
-    # geom_errorbar(aes(xmin=NO2coef-no2stdErr, xmax=NO2coef+no2stdErr), width=.0002)+ # using +-1 standard Deviation
-    geom_errorbar(aes(xmin=no2CI_2.5, xmax=no2CI_97.5), width=.0002)+ # using 95% CI
-    # facet_wrap(facets = vars(crop),labeller=as_labeller(crop_names))+#, scales = "free_x")
-    ylab(NULL)+
-    xlab(expression(NO[2]~coefficient))+
-    geom_vline(xintercept=0,color="grey")+
-    # ggtitle(paste0("1/2d FE - ",
-    #                vi,
-    #                ' - Weath:',unique(Dataframe$weath_control),
-    #                '- O3:',unique(Dataframe$o3_control)
-    # )
-    # )+
-    # coord_cartesian(xlim = c(-0.0035, 0.001))+
-    scale_x_continuous(labels = prettyZero)+
-    # theme(panel.spacing.x = unit(4, "mm"))+
+
+  ggplot(data=Dataframe, mapping=aes(y= NO2coef, x = CNTRY_NAME, ymin=no2CI_2.5, ymax=no2CI_97.5, colour=crop))+
+    geom_point(aes(size=NpointsPerc, shape=signif),alpha=1,stroke=2, position=position_dodge(width=0.3))+
+    geom_errorbar(width=.002, position=position_dodge(0.3))+ # using 95% CI
+    coord_flip()+
+    xlab(NULL)+
+    ylab(expression(NO[2]~coefficient))+
+    geom_hline(yintercept=0,color="grey")+
+    scale_y_continuous(labels = prettyZero)+
     guides(size=FALSE,
-           colour = guide_legend(order = 1,reverse=TRUE), 
+           colour = guide_legend(order = 1,reverse=TRUE),
            shape = guide_legend(order = 2)
            )+# get rid of Npoints legend
-           # colour = guide_legend(reverse=TRUE))+ #reverse order legend: first winter then summer
-
-    # guides(fill=FALSE)+# get rid of Country_name legend
     labs(shape="p-value",colour="season")+
-    # scale_shape_manual(values=shapes)+
     scale_shape_manual(values=c(16,1))+ # shapes need to be from21-25 to have a fill and color property
-    scale_colour_manual(values=c("goldenrod2", "royalblue1"))+ # Maize and wheat
-    # scale_colour_manual(values=c("red","goldenrod2", "royalblue1"))+ # if adding RICE
-    # theme(legend.position=c(.9,.5),
-    #       panel.background = element_rect(fill = 'white', colour = 'gray90'))
+    scale_colour_manual(values=c("#00B680", "#007CA6"))+ #green/blue
     theme_bw()
-  # theme(legend.position=c(.9,.5))
-  
-  # labs(x=expression(Production~rate~" "~mu~moles~NO[3]^{-1}-N~Kg^{-1}),
-  #      y=expression(Concentration~mg~L^{-1})) 
-  
   
   ggsave(
     fname,
@@ -470,60 +456,57 @@ plot_NO2coeffs_v2(outAll.overall,'NIRv_max',c(16),"fig4_No2coeffAllyears.png")
 
 # Fig 5
 plot_NO2coeffs_v2<-function(Dataframe,vi,shapes,fname){
-  # 
-  # Dataframe<-outAll.multi
-  # vi<-'NIRv_max'
+
   Dataframe$crop[Dataframe$crop=='maize'] <- 'summer'
   Dataframe$crop[Dataframe$crop=='wheat'] <- 'winter'
   Dataframe$crop[Dataframe$crop=='rice'] <- 'rice'
   
   Dataframe<-Dataframe %>%filter(greenness_var==vi)
   Dataframe<-Dataframe %>%filter(NpointsPerc>0.01)
-  
-  
-  # Dataframe<- Dataframe %>% mutate(regime_signif = paste0(regime,signif))
-  # Dataframe$regime_signif <- factor(Dataframe$regime_signif,
-  #                                   labels = c("high",  "low>= 0.05",  "low",   "high>= 0.05"))
-  # # Dataframe$regime_signif%>%unique() #"high< 0.05"  "low>= 0.05"  "low< 0.05"   "high>= 0.05"
+
   Dataframe<- Dataframe%>%mutate(CNTRY_NAME=factor(CNTRY_NAME, levels = c("Western Europe", "United States", "South America","India","China")))
   
   Dataframe$crop = factor(Dataframe$crop, levels=c('winter','summer','rice'))
   Dataframe$regime = factor(Dataframe$regime, levels=c('low','high'))
   
   
-  ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = CNTRY_NAME))+
-    geom_point(aes(colour=regime, size=NpointsPerc, shape=signif),alpha=1,stroke=2)+
-    # geom_point(aes(fill=CNTRY_NAME, colour=signif, size=NpointsPerc, shape=regime),alpha=0.4,stroke=1)+
-    # geom_errorbar(aes(xmin=NO2coef-no2stdErr, xmax=NO2coef+no2stdErr), width=.0002)+
-    geom_errorbar(aes(xmin=no2CI_2.5, xmax=no2CI_97.5), width=.0002)+ # using 95% CI
+  # ggplot(data = Dataframe, mapping = aes(x = NO2coef, y = CNTRY_NAME))+
+  #   geom_point(aes(colour=regime, size=NpointsPerc, shape=signif),alpha=1,stroke=2)+
+  #   geom_errorbar(aes(xmin=no2CI_2.5, xmax=no2CI_97.5), width=.0002)+ # using 95% CI
+  #   facet_wrap(facets = vars(crop))+#, scales = "free_x")
+  #   ylab(NULL)+
+  #   xlab(expression(NO[2]~coefficient))+
+  #   geom_vline(xintercept=0,color="grey")+
+  #   coord_cartesian(xlim = c(-0.005, 0.001))+
+  #   scale_x_continuous(labels = prettyZero)+
+  #   guides(size=FALSE,# get rid of Npoints legend
+  #          colour = guide_legend(order = 1), 
+  #          shape = guide_legend(order = 2)
+  #   )+
+  #   labs(shape="p-value",colour="regime")+
+  #   scale_shape_manual(values=c(16,1))+ # shapes need to be from21-25 to have a fill and color property
+  #   theme_bw()
+  
+  
+  
+  
+  ggplot(data = Dataframe, mapping = aes(y = NO2coef, x = CNTRY_NAME,colour=regime, ymin=no2CI_2.5, ymax=no2CI_97.5))+
+    geom_point(aes(size=NpointsPerc, shape=signif),alpha=1,stroke=2, position=position_dodge(width=0.5))+
+    geom_errorbar(width=.0002, position=position_dodge(width=0.5))+ # using 95% CI
     facet_wrap(facets = vars(crop))+#, scales = "free_x")
-    ylab(NULL)+
-    xlab(expression(NO[2]~coefficient))+
-    geom_vline(xintercept=0,color="grey")+
-    # ggtitle(paste0("1/2d FE - ",
-    #                vi,
-    #                ' - Weath:',unique(Dataframe$weath_control),
-    #                '- O3:',unique(Dataframe$o3_control)
-    # )
-    # )+
-    coord_cartesian(xlim = c(-0.005, 0.001))+
-    scale_x_continuous(labels = prettyZero)+
-    # theme(panel.spacing.x = unit(4, "mm"))+
+    xlab(NULL)+
+    ylab(expression(NO[2]~coefficient))+
+    geom_hline(yintercept=0,color="grey")+
+    coord_cartesian(ylim = c(-0.005, 0.001))+
+    scale_y_continuous(labels = prettyZero)+
     guides(size=FALSE,# get rid of Npoints legend
            colour = guide_legend(order = 1), 
            shape = guide_legend(order = 2)
     )+
     labs(shape="p-value",colour="regime")+
-    # labs(shape="regime",colour="season")+
-    # guides(fill=FALSE)+# get rid of Country_name legend
-    # scale_shape_manual(values=shapes)+
     scale_shape_manual(values=c(16,1))+ # shapes need to be from21-25 to have a fill and color property
-    # scale_shape_manual(name ='regime' ,values=c(15,0,17,2),breaks=c("high",  "low"))+ # shapes need to be from21-25 to have a fill and color property
-    # scale_colour_manual(name ='season' ,values=c("royalblue1", "goldenrod2","red","green"),guide=NULL)+ #set shape border possible colors
-    # scale_colour_manual(values=c("red","goldenrod2", "royalblue1"))+ # if adding RICE
-    # theme(legend.position=c(.95,.80))
-    theme_bw()
-  
+    theme_bw()+coord_flip()
+
   ggsave(
     fname,
     plot = last_plot(),
@@ -538,6 +521,6 @@ plot_NO2coeffs_v2<-function(Dataframe,vi,shapes,fname){
   )
   
 }
-
+library('svglite')
 plot_NO2coeffs_v2(outAll.multi,'NIRv_max',c(15,17),"fig5_No2coeffAllyears_byregime.png")
 
